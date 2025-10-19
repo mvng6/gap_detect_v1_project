@@ -67,8 +67,8 @@ ros2 launch dsr_bringup2 dsr_bringup2_rviz.launch.py mode:=virtual model:=a0912
 
 ## 📚 문서
 
-- [프로젝트 계획서](gap_detect_v1_project.md)
-- [ROS1-ROS2 브리지 가이드](Noetic_Humble_bridge_guide.md)
+- [프로젝트 계획서](Project_gap_detect_v1.md)
+- [ROS1-ROS2 브리지 가이드](README_Noetic_Humble_bridge_guide.md)
 - [두산 로봇 설치 가이드](README_doosan_robot.md)
 
 ## 🤝 기여
