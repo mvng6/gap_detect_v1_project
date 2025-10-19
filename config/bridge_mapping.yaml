@@ -1,0 +1,49 @@
+# ros1_bridge 메시지 매핑 설정 파일
+# ROS1과 ROS2 간의 메시지 매핑을 정의
+
+# 갭 측정 관련 메시지 매핑
+gap_detection_msgs/SectionArrival:
+  ros1_type: gap_detection_msgs/SectionArrival
+  ros2_type: gap_detection_msgs/msg/SectionArrival
+
+gap_detection_msgs/MeasurementCommand:
+  ros1_type: gap_detection_msgs/MeasurementCommand
+  ros2_type: gap_detection_msgs/msg/MeasurementCommand
+
+gap_detection_msgs/MeasurementResult:
+  ros1_type: gap_detection_msgs/MeasurementResult
+  ros2_type: gap_detection_msgs/msg/MeasurementResult
+
+gap_detection_msgs/ProcessComplete:
+  ros1_type: gap_detection_msgs/ProcessComplete
+  ros2_type: gap_detection_msgs/msg/ProcessComplete
+
+# 로봇 협업 관련 메시지 매핑
+robot_coordination_msgs/SystemStatus:
+  ros1_type: robot_coordination_msgs/SystemStatus
+  ros2_type: robot_coordination_msgs/msg/SystemStatus
+
+robot_coordination_msgs/RobotState:
+  ros1_type: robot_coordination_msgs/RobotState
+  ros2_type: robot_coordination_msgs/msg/RobotState
+
+robot_coordination_msgs/CoordinationCommand:
+  ros1_type: robot_coordination_msgs/CoordinationCommand
+  ros2_type: robot_coordination_msgs/msg/CoordinationCommand
+
+# 서비스 매핑
+gap_detection_msgs/StartMeasurement:
+  ros1_type: gap_detection_msgs/StartMeasurement
+  ros2_type: gap_detection_msgs/srv/StartMeasurement
+
+gap_detection_msgs/StopMeasurement:
+  ros1_type: gap_detection_msgs/StopMeasurement
+  ros2_type: gap_detection_msgs/srv/StopMeasurement
+
+robot_coordination_msgs/GetSystemStatus:
+  ros1_type: robot_coordination_msgs/GetSystemStatus
+  ros2_type: robot_coordination_msgs/srv/GetSystemStatus
+
+robot_coordination_msgs/SetRobotState:
+  ros1_type: robot_coordination_msgs/SetRobotState
+  ros2_type: robot_coordination_msgs/srv/SetRobotState

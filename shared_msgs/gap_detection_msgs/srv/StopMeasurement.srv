@@ -1,0 +1,5 @@
+# 측정 중지 서비스
+bool emergency_stop
+---
+bool success
+string message

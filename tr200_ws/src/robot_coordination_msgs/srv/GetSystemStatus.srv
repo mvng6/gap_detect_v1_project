@@ -1,0 +1,10 @@
+# 시스템 상태 조회 서비스
+string system_id
+---
+bool success
+string system_status
+string mobile_robot_status
+string doosan_robot_status
+int32 current_section
+bool is_measuring
+string error_message

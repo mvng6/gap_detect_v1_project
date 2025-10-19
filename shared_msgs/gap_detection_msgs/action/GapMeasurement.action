@@ -1,0 +1,15 @@
+# 갭 측정 액션
+int32 section_number
+geometry_msgs/Pose target_pose
+string measurement_type
+float64 timeout_seconds
+---
+bool measurement_success
+float64[] measurement_data
+geometry_msgs/Pose measurement_pose
+string error_message
+---
+# 피드백
+string current_status
+float32 progress_percentage
+geometry_msgs/Pose current_pose

@@ -1,0 +1,9 @@
+# 로봇 상태 설정 서비스
+string robot_id
+string new_state
+geometry_msgs/Pose target_pose
+bool force_update
+---
+bool success
+string message
+string current_state

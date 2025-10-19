@@ -1,0 +1,8 @@
+# 측정 시작 서비스
+int32 section_number
+geometry_msgs/Pose target_pose
+string measurement_type
+float64 timeout_seconds
+---
+bool success
+string message

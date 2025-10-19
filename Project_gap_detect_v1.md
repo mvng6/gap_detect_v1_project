@@ -61,12 +61,18 @@ home/ldj/
     │       ├── doosan-robot2/             # 두산 로봇 패키지 (기존 메시지/서비스 포함)
     │       ├── gap_detection_controller/  # 두산 로봇 제어 패키지
     │       └── gap_process_manager/        # 전체 프로세스 관리 패키지
-    ├── tr200_ws/                          # ROS1 응용 프로그램 워크스페이스
+    ├── tr200_ws/                          # ROS1 응용 프로그램 워크스페이스 (프로젝트 내부 통합)
     │   └── src/
+    │       ├── gap_detection_msgs/         # ROS1 공통 메시지 패키지
+    │       ├── robot_coordination_msgs/   # ROS1 공통 메시지 패키지
     │       └── tr200_control/             # TR200 모바일 로봇 제어 패키지
-    ├── shared_msgs/                       # 공통 메시지 정의 디렉토리
-    │   ├── gap_detection_msgs/            # 갭 측정 관련 메시지
-    │   └── robot_coordination_msgs/       # 로봇 간 협업 메시지
+    ├── shared_msgs/                       # ROS2 공통 메시지 정의 디렉토리
+    │   ├── gap_detection_msgs/            # ROS2 갭 측정 관련 메시지
+    │   └── robot_coordination_msgs/       # ROS2 로봇 간 협업 메시지
+    ├── bridge/                            # ROS1-ROS2 브리지 관련 파일들
+    │   ├── docker-compose.yml             # 브리지 전용 Docker Compose
+    │   ├── Dockerfile.bridge              # 브리지 Docker 이미지
+    │   └── bridge_config.yaml             # 브리지 설정 파일
     ├── config/                            # 중앙 설정 파일 디렉토리
     │   ├── doosan_robot_config.yaml
     │   ├── mobile_robot_config.yaml
@@ -100,51 +106,58 @@ home/ldj/
 ### Phase 1: 환경 설정 및 기본 통신 구축 (1-2주)
 
 #### 1.1 워크스페이스 구조 설정
-- [ ] `gap_detect_v1_ws` 디렉토리 생성
-- [ ] ROS2 워크스페이스 초기화 (`doosan_robot_ws/src/` 디렉토리 생성)
-- [ ] ROS1 워크스페이스 초기화 (`tr200_ws/src/` 디렉토리 생성)
-- [ ] 공통 메시지 디렉토리 생성 (`shared_msgs/` 디렉토리 생성)ctionArrival.msg: 구간 도착 신호
-
+- [x] `gap_detect_v1_ws` 디렉토리 생성
+- [x] ROS2 워크스페이스 초기화 (`doosan_robot_ws/src/` 디렉토리 생성)
+- [x] ROS1 워크스페이스 초기화 (`tr200_ws/src/` 디렉토리 생성)
+- [x] 공통 메시지 디렉토리 생성 (`shared_msgs/` 디렉토리 생성)
+- [x] Docker 디렉토리 생성 (`docker/` 디렉토리 생성)
+- [x] 기타 필수 디렉토리 생성 (`config/`, `launch/`, `scripts/`, `docs/`)
 - [x] ros1_bridge 워크스페이스 설정 (기존 환경 활용)
 
 #### 1.2 Docker 환경 설정
-- [ ] Docker 설치 및 설정
-- [ ] Docker 사용자 권한 설정
-- [ ] Docker Compose 설치 및 설정
+- [x] Docker 설치 및 설정 (Docker version 28.5.1)
+- [x] Docker 사용자 권한 설정 (docker 그룹 포함)
+- [x] Docker Compose 설치 및 설정 (Docker Compose version v2.40.0)
 - [ ] 두산 로봇 에뮬레이터 설치 스크립트 실행
 - [ ] TR200 모바일 로봇 Docker 이미지 빌드
 - [ ] Docker 컨테이너 테스트 (두 로봇 모두)
 
 #### 1.3 두산 로봇 패키지 설치
-- [ ] 두산 로봇 패키지 클론 (`git clone -b humble https://github.com/doosan-robotics/doosan-robot2.git`)
-- [ ] 의존성 설치 및 빌드
-- [ ] 기본 동작 테스트 (Rviz2, Gazebo 시뮬레이션)
+- [x] 두산 로봇 패키지 클론 (`git clone -b humble https://github.com/doosan-robotics/doosan-robot2.git`)
+- [x] 의존성 설치 및 빌드
+- [x] 기본 동작 테스트 (Rviz2, Gazebo 시뮬레이션)
 
 #### 1.4 공통 메시지 정의 및 브리지 설정
-- [ ] `gap_detection_msgs` 패키지 생성 (`shared_msgs/gap_detection_msgs`)
-- [ ] `robot_coordination_msgs` 패키지 생성 (`shared_msgs/robot_coordination_msgs`)
-- [ ] 메시지 타입 정의:
+- [x] `gap_detection_msgs` 패키지 생성 (`shared_msgs/gap_detection_msgs`)
+- [x] `robot_coordination_msgs` 패키지 생성 (`shared_msgs/robot_coordination_msgs`)
+- [x] 메시지 타입 정의:
   - `SectionArrival.msg` (구간 도착 신호)
   - `MeasurementCommand.msg` (측정 명령)
   - `MeasurementResult.msg` (측정 결과)
   - `ProcessComplete.msg` (프로세스 완료 신호)
-- [ ] ros1_bridge 메시지 매핑 설정 (`config/bridge_mapping.yaml`)
-- [ ] 기존 두산 로봇 메시지와의 호환성 확인
+- [x] ros1_bridge 메시지 매핑 설정 (`config/bridge_mapping.yaml`)
+- [x] 기존 두산 로봇 메시지와의 호환성 확인
+- [x] ROS1 메시지 패키지 빌드 완료 (기존 noetic_ws 활용)
+- [x] ROS2 메시지 패키지 빌드 완료 (ament_cmake_ros 활용)
 
 #### 1.5 Docker 및 빌드 스크립트 작성
-- [ ] Docker Compose 설정 파일 작성 (`docker/docker-compose.yml`)
+- [x] Docker Compose 설정 파일 작성 (`bridge/docker-compose.yml`)
 - [ ] 두산 로봇 Dockerfile 작성 (`docker/Dockerfile.doosan`)
 - [ ] TR200 모바일 로봇 Dockerfile 작성 (`docker/Dockerfile.tr200`)
-- [ ] ROS1-ROS2 브리지 Dockerfile 작성 (`docker/Dockerfile.bridge`)
+- [x] ROS1-ROS2 브리지 Dockerfile 작성 (`bridge/Dockerfile.bridge`)
+- [x] 브리지 관리 스크립트 작성 (`bridge/manage_bridge.sh`)
 - [ ] Docker 이미지 빌드 스크립트 작성 (`scripts/docker_build_images.sh`)
 - [ ] Docker 시스템 시작 스크립트 작성 (`scripts/docker_start_all.sh`)
 - [ ] Docker 시스템 중지 스크립트 작성 (`scripts/docker_stop_all.sh`)
 - [ ] Docker 로그 확인 스크립트 작성 (`scripts/docker_logs.sh`)
-- [ ] 통합 빌드 스크립트 작성 (`scripts/build_all.sh`)
+- [x] 공통 메시지 빌드 스크립트 작성 (`scripts/build_msgs.sh`)
 
 #### 1.6 기본 통신 테스트
 - [x] ROS1-ROS2 브리지 설정 및 테스트 (기존 환경 활용)
-- [ ] 커스텀 메시지 송수신 테스트
+- [x] 브리지 Docker 컨테이너 설정 완료
+- [x] 브리지 관리 스크립트 작성 완료
+- [x] 호스트 시스템에서 dynamic_bridge 실행 성공
+- [ ] 커스텀 메시지 송수신 테스트 (환경 변수 충돌 해결 필요)
 - [ ] 통신 지연 및 안정성 확인
 
 ### Phase 2: 두산 로봇 제어 로직 구현 (2-3주)
@@ -226,25 +239,27 @@ home/ldj/
 
 ### 빌드 명령어
 ```bash
-# Docker 이미지 빌드
-cd ~/gap_detect_v1_ws
-./scripts/docker_build_images.sh
-
 # 공통 메시지 빌드 (먼저 빌드 필요)
-cd ~/gap_detect_v1_ws/shared_msgs
+cd ~/gap_detect_v1_ws
 ./scripts/build_msgs.sh
 
-# ROS1 패키지 빌드
-cd ~/gap_detect_v1_ws/tr200_ws
-catkin_make
+# ROS1 패키지 빌드 (기존 noetic_ws 활용)
+cd ~/noetic_ws
+catkin_make_isolated
 
 # ROS2 패키지 빌드
+cd ~/gap_detect_v1_ws/shared_msgs
+colcon build
+
+# 두산 로봇 패키지 빌드
 cd ~/gap_detect_v1_ws/doosan_robot_ws
 colcon build
 
-# 통합 빌드 (스크립트 사용)
-cd ~/gap_detect_v1_ws
-./scripts/build_all.sh
+# 브리지 실행 (호스트 시스템)
+cd ~/ros1_bridge
+source install/setup.bash
+export ROS_MASTER_URI=http://localhost:11311
+ros2 run ros1_bridge dynamic_bridge
 ```
 
 ### Docker 환경 설정
@@ -260,14 +275,21 @@ cd ~/gap_detect_v1_ws
 ./scripts/docker_logs.sh
 
 # 공통 메시지 환경 설정
+# ROS1 메시지 패키지 (기존 noetic_ws 활용)
+source ~/noetic_ws/devel_isolated/setup.bash
+
+# ROS2 메시지 패키지 (프로젝트 내부 shared_msgs)
 source ~/gap_detect_v1_ws/shared_msgs/install/setup.bash
 
-# ROS1 환경 설정 (컨테이너 내부)
-docker exec -it gap_detect_tr200_v1 bash
-source /opt/ros/noetic/setup.bash
-source /workspace/devel/setup.bash
+# 브리지 환경 설정 (호스트 시스템)
+source ~/ros1_bridge/install/setup.bash
+export ROS_MASTER_URI=http://localhost:11311
 
-# ROS2 환경 설정 (컨테이너 내부)
+# ROS1 환경 설정 (컨테이너 내부 - 향후 구현)
+docker exec -it gap_detect_tr200_v1 bash
+source /workspace/tr200_ws/devel/setup.bash
+
+# ROS2 환경 설정 (컨테이너 내부 - 향후 구현)
 docker exec -it gap_detect_dsr_v1 bash
 source /opt/ros/humble/setup.bash
 source /workspace/install/setup.bash

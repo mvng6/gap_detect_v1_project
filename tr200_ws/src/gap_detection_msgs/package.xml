@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gap_detection_msgs</name>
+  <version>1.0.0</version>
+  <description>Custom messages for gap detection robot system</description>
+  <maintainer email="gap_detect@example.com">Gap Detection Team</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>message_generation</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+  <exec_depend>message_runtime</exec_depend>
+
+  <export>
+    <build_type>catkin</build_type>
+  </export>
+</package>
