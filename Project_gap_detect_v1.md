@@ -22,25 +22,40 @@
 ### Docker 컨테이너 구성
 ```bash
 # 두산 로봇 에뮬레이터 컨테이너
-docker run -d --name doosan-emulator \
+docker run -d --name gap_detect_dsr_v1 \
   --network host \
   -p 12345:12345 \
   doosan-robotics/emulator:latest
 
+# TR200 모바일 로봇 시뮬레이터 컨테이너
+docker run -d --name gap_detect_tr200_v1 \
+  --network host \
+  -p 11311:11311 \
+  -v /dev:/dev \
+  --privileged \
+  tr200-mobile-robot:latest
+
 # 컨테이너 상태 확인
 docker ps
-docker logs doosan-emulator
+docker logs gap_detect_dsr_v1
+docker logs gap_detect_tr200_v1
 ```
 
 ## 🏗️ 프로젝트 디렉토리 구조
 
-### 표준 워크스페이스 구조 (하이브리드 접근법)
+### Docker 기반 워크스페이스 구조
 ```
 home/ldj/
 ├── ros2_humble/                           # 기존 ROS2 Humble 워크스페이스 (참조용)
 ├── noetic_ws/                             # 기존 ROS1 Noetic 워크스페이스 (참조용)
 ├── ros1_bridge/                           # 기존 ROS1-ROS2 브리지 (참조용)
 └── gap_detect_v1_ws/                      # 프로젝트 전체 관리 최상위 디렉토리
+    ├── docker/                            # Docker 관련 파일들
+    │   ├── docker-compose.yml             # 전체 시스템 Docker Compose 설정
+    │   ├── Dockerfile.doosan              # 두산 로봇 Docker 이미지
+    │   ├── Dockerfile.tr200               # TR200 모바일 로봇 Docker 이미지
+    │   ├── Dockerfile.bridge              # ROS1-ROS2 브리지 Docker 이미지
+    │   └── docker-entrypoint.sh           # Docker 진입점 스크립트
     ├── doosan_robot_ws/                    # ROS2 응용 프로그램 워크스페이스
     │   └── src/
     │       ├── doosan-robot2/             # 두산 로봇 패키지 (기존 메시지/서비스 포함)
@@ -67,13 +82,16 @@ home/ldj/
     │   ├── build_ros2.sh                  # ROS2만 빌드
     │   ├── build_ros1.sh                  # ROS1만 빌드
     │   ├── build_msgs.sh                  # 공통 메시지 빌드
-    │   ├── launch_all.sh                  # 전체 시스템 실행
-    │   ├── docker_management.sh           # Docker 관리
+    │   ├── docker_start_all.sh            # 전체 Docker 시스템 시작
+    │   ├── docker_stop_all.sh             # 전체 Docker 시스템 중지
+    │   ├── docker_logs.sh                 # Docker 로그 확인
+    │   ├── docker_build_images.sh         # Docker 이미지 빌드
     │   └── test_communication.sh         # 통신 테스트
     └── docs/                              # 프로젝트 문서 디렉토리
         ├── README.md
         ├── API_Documentation.md
         ├── Message_Reference.md           # 메시지 참조 문서
+        ├── Docker_Guide.md                # Docker 사용 가이드
         └── Troubleshooting.md
 ```
 
@@ -92,8 +110,10 @@ home/ldj/
 #### 1.2 Docker 환경 설정
 - [ ] Docker 설치 및 설정
 - [ ] Docker 사용자 권한 설정
+- [ ] Docker Compose 설치 및 설정
 - [ ] 두산 로봇 에뮬레이터 설치 스크립트 실행
-- [ ] Docker 컨테이너 테스트
+- [ ] TR200 모바일 로봇 Docker 이미지 빌드
+- [ ] Docker 컨테이너 테스트 (두 로봇 모두)
 
 #### 1.3 두산 로봇 패키지 설치
 - [ ] 두산 로봇 패키지 클론 (`git clone -b humble https://github.com/doosan-robotics/doosan-robot2.git`)
@@ -111,13 +131,16 @@ home/ldj/
 - [ ] ros1_bridge 메시지 매핑 설정 (`config/bridge_mapping.yaml`)
 - [ ] 기존 두산 로봇 메시지와의 호환성 확인
 
-#### 1.5 빌드 스크립트 작성
-- [ ] ROS1 빌드 스크립트 작성 (`scripts/build_ros1.sh`)
-- [ ] ROS2 빌드 스크립트 작성 (`scripts/build_ros2.sh`)
-- [ ] 공통 메시지 빌드 스크립트 작성 (`scripts/build_msgs.sh`)
+#### 1.5 Docker 및 빌드 스크립트 작성
+- [ ] Docker Compose 설정 파일 작성 (`docker/docker-compose.yml`)
+- [ ] 두산 로봇 Dockerfile 작성 (`docker/Dockerfile.doosan`)
+- [ ] TR200 모바일 로봇 Dockerfile 작성 (`docker/Dockerfile.tr200`)
+- [ ] ROS1-ROS2 브리지 Dockerfile 작성 (`docker/Dockerfile.bridge`)
+- [ ] Docker 이미지 빌드 스크립트 작성 (`scripts/docker_build_images.sh`)
+- [ ] Docker 시스템 시작 스크립트 작성 (`scripts/docker_start_all.sh`)
+- [ ] Docker 시스템 중지 스크립트 작성 (`scripts/docker_stop_all.sh`)
+- [ ] Docker 로그 확인 스크립트 작성 (`scripts/docker_logs.sh`)
 - [ ] 통합 빌드 스크립트 작성 (`scripts/build_all.sh`)
-- [ ] Docker 컨테이너 관리 스크립트 작성 (`scripts/docker_management.sh`)
-- [ ] 전체 시스템 실행 스크립트 작성 (`scripts/launch_all.sh`)
 
 #### 1.6 기본 통신 테스트
 - [x] ROS1-ROS2 브리지 설정 및 테스트 (기존 환경 활용)
@@ -203,6 +226,10 @@ home/ldj/
 
 ### 빌드 명령어
 ```bash
+# Docker 이미지 빌드
+cd ~/gap_detect_v1_ws
+./scripts/docker_build_images.sh
+
 # 공통 메시지 빌드 (먼저 빌드 필요)
 cd ~/gap_detect_v1_ws/shared_msgs
 ./scripts/build_msgs.sh
@@ -220,20 +247,30 @@ cd ~/gap_detect_v1_ws
 ./scripts/build_all.sh
 ```
 
-### 환경 설정
+### Docker 환경 설정
 ```bash
+# Docker 시스템 시작
+cd ~/gap_detect_v1_ws
+./scripts/docker_start_all.sh
+
+# Docker 시스템 중지
+./scripts/docker_stop_all.sh
+
+# Docker 로그 확인
+./scripts/docker_logs.sh
+
 # 공통 메시지 환경 설정
 source ~/gap_detect_v1_ws/shared_msgs/install/setup.bash
 
-# ROS1 환경 설정
-source ~/noetic_ws/install_isolated/setup.bash
-source ~/gap_detect_v1_ws/tr200_ws/devel/setup.bash
+# ROS1 환경 설정 (컨테이너 내부)
+docker exec -it gap_detect_tr200_v1 bash
+source /opt/ros/noetic/setup.bash
+source /workspace/devel/setup.bash
 
-# ROS2 환경 설정
-source ~/gap_detect_v1_ws/doosan_robot_ws/install/setup.bash
-
-# 브리지 환경 설정
-source ~/ros1_bridge/install/setup.bash
+# ROS2 환경 설정 (컨테이너 내부)
+docker exec -it gap_detect_dsr_v1 bash
+source /opt/ros/humble/setup.bash
+source /workspace/install/setup.bash
 ```
 
 ## 🔧 기술 스택 및 도구
@@ -298,39 +335,44 @@ robot_coordination_msgs/
 
 ## 🚀 실행 시나리오
 
-### 1. 시스템 시작
+### 1. 시스템 시작 (Docker 기반)
 ```bash
-# 터미널 1: Docker 컨테이너 시작
+# 전체 Docker 시스템 시작
 cd ~/gap_detect_v1_ws
-./scripts/docker_management.sh start
+./scripts/docker_start_all.sh
 
-# 터미널 2: ROS1 환경 (모바일 로봇)
-cd ~/gap_detect_v1_ws/tr200_ws
-source ~/noetic_ws/install_isolated/setup.bash
-source ~/gap_detect_v1_ws/shared_msgs/install/setup.bash
-source devel/setup.bash
+# 또는 개별 컨테이너 시작
+docker-compose -f docker/docker-compose.yml up -d
+
+# 컨테이너 상태 확인
+docker ps
+
+# 로그 확인
+./scripts/docker_logs.sh
+```
+
+### 2. 개별 로봇 실행 (컨테이너 내부)
+```bash
+# TR200 모바일 로봇 실행
+docker exec -it gap_detect_tr200_v1 bash
+source /opt/ros/noetic/setup.bash
+source /workspace/devel/setup.bash
 roslaunch tr200_control mobile_robot.launch
 
-# 터미널 3: ROS1-ROS2 브리지
-cd ~/ros1_bridge
-source install/setup.bash
-export ROS_MASTER_URI=http://localhost:11311
-ros2 run ros1_bridge dynamic_bridge --mapping-file ~/gap_detect_v1_ws/config/bridge_mapping.yaml
-
-# 터미널 4: ROS2 환경 (두산 로봇)
-cd ~/gap_detect_v1_ws/doosan_robot_ws
-source ~/gap_detect_v1_ws/shared_msgs/install/setup.bash
-source install/setup.bash
+# 두산 로봇 실행
+docker exec -it gap_detect_dsr_v1 bash
+source /opt/ros/humble/setup.bash
+source /workspace/install/setup.bash
 ros2 launch dsr_bringup2 dsr_bringup2_rviz.launch.py mode:=virtual host:=127.0.0.1 port:=12345 model:=a0912
 
-# 터미널 5: 통합 제어 시스템
-cd ~/gap_detect_v1_ws/doosan_robot_ws
-source ~/gap_detect_v1_ws/shared_msgs/install/setup.bash
-source install/setup.bash
+# 통합 제어 시스템 실행
+docker exec -it gap_detect_dsr_v1 bash
+source /opt/ros/humble/setup.bash
+source /workspace/install/setup.bash
 ros2 launch gap_process_manager gap_detection_system.launch.py
 ```
 
-### 2. 공정 시퀀스
+### 3. 공정 시퀀스
 1. **초기화**: 모든 로봇 홈 포지션으로 이동
 2. **1구간 이동**: 모바일 로봇이 1구간으로 이동
 3. **측정 수행**: 두산 로봇이 갭 단차 측정
@@ -344,9 +386,11 @@ ros2 launch gap_process_manager gap_detection_system.launch.py
 ## ⚠️ 주의사항 및 고려사항
 
 ### Docker 환경
-- Docker 컨테이너가 실행 중이어야 두산 로봇 에뮬레이터 사용 가능
+- Docker 컨테이너가 실행 중이어야 두 로봇 모두 사용 가능
 - 컨테이너 재시작 시 포트 충돌 방지
 - Docker 리소스 사용량 모니터링 필요
+- 컨테이너 간 네트워크 통신 설정 필요
+- Docker 이미지 버전 관리 및 업데이트
 
 ### 안전성
 - 로봇 간 충돌 방지를 위한 안전 거리 확보
