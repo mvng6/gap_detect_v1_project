@@ -1,0 +1,65 @@
+# Git ignore file for Gap Detection Robot System Project
+
+# ROS build files
+build/
+devel/
+install/
+log/
+install_isolated/
+build_isolated/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Docker files
+docker-compose.override.yml
+
+# Backup files
+*.bak
+*.backup
+
+# Node modules (if any)
+node_modules/
+
+# Compiled binaries
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Coverage reports
+coverage/
+*.gcov
+*.gcno
+*.gcda
+
+# Test results
+test_results/
