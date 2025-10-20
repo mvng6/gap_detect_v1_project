@@ -32,9 +32,6 @@ Thumbs.db
 *.temp
 *.log
 
-# Docker files
-docker-compose.override.yml
-
 # Backup files
 *.bak
 *.backup

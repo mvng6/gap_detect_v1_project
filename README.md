@@ -21,26 +21,26 @@ gap_detect_v1_ws/
 
 ### 1. 환경 설정
 ```bash
-# Docker 컨테이너 시작
-./scripts/docker_management.sh start
+# 공통 메시지 빌드
+./scripts/build_msgs.sh
 
 # 전체 시스템 빌드
 ./scripts/build_all.sh
 
-# 전체 시스템 실행
-./scripts/launch_all.sh
+# 통신 테스트
+./scripts/test_communication.sh
 ```
 
 ### 2. 개별 실행
 ```bash
 # ROS1 환경 (모바일 로봇)
-cd tr200_ws
-source devel/setup.bash
+source ~/noetic_ws/install_isolated/setup.bash
+export ROS_MASTER_URI=http://localhost:11311
 roslaunch tr200_control mobile_robot.launch
 
 # ROS2 환경 (두산 로봇)
-cd doosan_robot_ws
-source install/setup.bash
+source ~/ros2_humble/install/setup.bash
+source ~/gap_detect_v1_ws/doosan_robot_ws/install/setup.bash
 ros2 launch dsr_bringup2 dsr_bringup2_rviz.launch.py mode:=virtual model:=a0912
 ```
 
@@ -58,11 +58,10 @@ ros2 launch dsr_bringup2 dsr_bringup2_rviz.launch.py mode:=virtual model:=a0912
 - **ROS2 Humble**: 두산 로봇 제어
 - **ROS1 Noetic**: TR200 모바일 로봇 제어
 - **ros1_bridge**: ROS1-ROS2 통신 브리지
-- **Docker**: 두산 로봇 에뮬레이터 실행 환경
 
 ## 📊 하드웨어
 
-- **두산 로봇**: A0912 모델 (Docker 에뮬레이터 모드)
+- **두산 로봇**: A0912 모델 (에뮬레이터 모드)
 - **TR200 모바일 로봇**: 커스텀 모바일 플랫폼
 
 ## 📚 문서

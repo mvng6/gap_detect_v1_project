@@ -90,21 +90,13 @@ source /opt/ros/humble/setup.bash
 source install/setup.bash
 ```
 
-## 🐳 Docker 에뮬레이터 설정
+## 🐳 에뮬레이터 설정
 
-### Docker 에뮬레이터 컨테이너 실행
+### 에뮬레이터 실행
 ```bash
-# 두산 로봇 에뮬레이터 컨테이너 실행
-docker run -d --name gap_detect_dsr_v1 \
-  --network host \
-  -p 12345:12345 \
-  doosan-robotics/emulator:latest
-
-# 컨테이너 상태 확인
-docker ps
-
-# 컨테이너 로그 확인
-docker logs gap_detect_dsr_v1
+# 두산 로봇 에뮬레이터 실행 (호스트 시스템에서 직접 실행)
+# 에뮬레이터는 두산 로봇 패키지 설치 시 자동으로 설치됨
+# 가상 모드로 실행 시 자동으로 에뮬레이터가 시작됨
 ```
 
 ## 🧪 기본 동작 테스트
@@ -113,7 +105,7 @@ docker logs gap_detect_dsr_v1
 ```bash
 # 환경 설정
 cd ~/gap_detect_v1_ws/doosan_robot_ws
-source /opt/ros/humble/setup.bash
+source ~/ros2_humble/install/setup.bash
 source install/setup.bash
 
 # 가상 모드로 Rviz2 실행
@@ -124,7 +116,7 @@ ros2 launch dsr_bringup2 dsr_bringup2_rviz.launch.py mode:=virtual host:=127.0.0
 ```bash
 # 환경 설정
 cd ~/gap_detect_v1_ws/doosan_robot_ws
-source /opt/ros/humble/setup.bash
+source ~/ros2_humble/install/setup.bash
 source install/setup.bash
 
 # 가상 모드로 Gazebo 실행
@@ -136,7 +128,7 @@ ros2 launch dsr_bringup2 dsr_bringup2_gazebo.launch.py mode:=virtual host:=127.0
 ### 패키지 설치 확인
 ```bash
 # ROS2 환경 설정
-source /opt/ros/humble/setup.bash
+source ~/ros2_humble/install/setup.bash
 source ~/gap_detect_v1_ws/doosan_robot_ws/install/setup.bash
 
 # ROS2 패키지 목록 확인
@@ -149,7 +141,7 @@ ros2 node list
 ### 토픽 확인
 ```bash
 # ROS2 환경 설정
-source /opt/ros/humble/setup.bash
+source ~/ros2_humble/install/setup.bash
 source ~/gap_detect_v1_ws/doosan_robot_ws/install/setup.bash
 
 # 토픽 목록 확인
@@ -161,11 +153,10 @@ ros2 topic info /dsr/joint_states
 
 ## ⚠️ 주의사항
 
-1. **ROS2 환경 설정**: 모든 명령어 실행 전에 `source /opt/ros/humble/setup.bash`를 실행해야 합니다.
-2. **Docker 권한**: Docker 컨테이너 실행 시 적절한 권한이 필요합니다.
-3. **포트 충돌**: 포트 12345가 이미 사용 중인 경우 다른 포트를 사용하세요.
-4. **모델 설정**: A0912 모델을 사용하므로 `model:=a0912` 파라미터를 반드시 포함하세요.
-5. **네트워크 설정**: `--network host` 옵션으로 호스트 네트워크를 사용합니다.
+1. **ROS2 환경 설정**: 모든 명령어 실행 전에 `source ~/ros2_humble/install/setup.bash`를 실행해야 합니다.
+2. **포트 충돌**: 포트 12345가 이미 사용 중인 경우 다른 포트를 사용하세요.
+3. **모델 설정**: A0912 모델을 사용하므로 `model:=a0912` 파라미터를 반드시 포함하세요.
+4. **네트워크 설정**: 가상 모드에서는 `host:=127.0.0.1`을 사용합니다.
 
 ## 🚨 문제 해결
 
@@ -174,14 +165,14 @@ ros2 topic info /dsr/joint_states
 #### 1. ROS2 환경 설정 문제
 ```bash
 # ROS2 환경이 설정되지 않은 경우
-source /opt/ros/humble/setup.bash
+source ~/ros2_humble/install/setup.bash
 
 # 환경 변수 확인
 echo $ROS_DISTRO
 
 # 빌드 시 ROS2 환경 설정
 cd ~/gap_detect_v1_ws/doosan_robot_ws
-source /opt/ros/humble/setup.bash
+source ~/ros2_humble/install/setup.bash
 colcon build
 ```
 
@@ -202,27 +193,23 @@ sudo apt-get install -y libpoco-dev libyaml-cpp-dev wget
 rm -rf build/ install/ log/
 
 # ROS2 환경 설정 후 다시 빌드
-source /opt/ros/humble/setup.bash
+source ~/ros2_humble/install/setup.bash
 colcon build
 ```
 
-#### 4. Docker 컨테이너 실행 실패
+#### 4. 에뮬레이터 실행 실패
 ```bash
-# 기존 컨테이너 정리
-docker stop gap_detect_dsr_v1
-docker rm gap_detect_dsr_v1
+# 에뮬레이터 재설치
+cd ~/gap_detect_v1_ws/doosan_robot_ws/src/doosan-robot2
+sudo ./install_emulator.sh
 
-# 다시 실행
-docker run -d --name gap_detect_dsr_v1 \
-  --network host \
-  -p 12345:12345 \
-  doosan-robotics/emulator:latest
+# 포트 확인
+netstat -tlnp | grep 12345
 ```
 
 ## 📚 추가 정보
 
 - [두산 로봇 공식 ROS2 매뉴얼](https://doosanrobotics.github.io/doosan-robotics-ros-manual/humble/index.html)
-- [Docker 공식 문서](https://docs.docker.com/)
 - [ROS2 Humble 문서](https://docs.ros.org/en/humble/)
 
 ## ✅ 설치 완료 체크리스트
@@ -233,7 +220,7 @@ docker run -d --name gap_detect_dsr_v1 \
 - [ ] 패키지 의존성 설치 완료
 - [ ] 에뮬레이터 설치 스크립트 실행 완료
 - [ ] 패키지 빌드 완료
-- [ ] Docker 에뮬레이터 컨테이너 실행 완료
+- [ ] 에뮬레이터 실행 완료
 - [ ] Rviz2 테스트 완료
 - [ ] Gazebo 시뮬레이션 테스트 완료
 
